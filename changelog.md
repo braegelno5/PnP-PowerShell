@@ -1,4 +1,168 @@
-# OfficeDevPnP.PowerShell Changelog #
+# SharePointPnP.PowerShell Changelog #
+
+**2017-05-06**
+* Added Set-PnPWebPermissions
+* Updated Get-PnPListItem to execute scriptblocks
+* Added Set-PnPListItemPermissions
+* Added Get-PnPDefaultColumnValues
+* Added Set-PnPListPermissions
+
+
+**2017-01-27**
+* Added Get-PnPTerm
+* Added Get-PnPTermSet
+* Added New-PnPTerm
+* Added New-PnPTermSet
+* Added New-PnPTermGroup
+* Updated Get-PnPTermGroup to optionally return all termgroups in a TermStore
+
+**2017-01-22**
+* Introducing the -Includes parameter. The parameter will allow you (on selected cmdlets) to retrieve values for properties that are not being retrieved by default. The parameter exposes the possible values on pressing tab, and you can specify multiple values. The parameter is available on the following cmdlets: Get-PnPAppInstance, Get-PnPCustomAction, Get-PnPDocumentSetTemplate, Get-PnPEventReceiver, Get-PnPFeature, Ensure-PnPFolder, Get-PnPFolder, Get-PnPList, Get-PnPView, Get-PnPGroup, Get-PnPRecyclyBinItem, Get-PnPSite, Get-PnPTermGroup, Get-PnPWeb.
+* Updated the output of a view cmdlets so return table formatted data.
+
+**2017-01-14**
+* Added Submit-PnPSearchQuery cmdlet
+* Added Set-PnPSiteClosure and Get-PnPSiteClosure cmdlets
+* Added Get-PnPContentTypePublishingHubUrl
+* Added Get-PnPSiteCollectionTermStore which returns the Site Collection Term Store.
+
+**2017-01-05**
+* Added Get-PnPTenantRecyclyBinItem cmdlet to list all items in the tenant scoped recycle bin
+* Added -Wait and -LockState properties to Set-PnPTenantSite
+* The Tenant cmdlets now report progress if the -Wait parameter is specified (where applicable)
+
+**2017-01-03**
+* HAPPY NEW YEAR!
+* Added Clear-PnPRecyclyBinItem, Clear-PnPTenantRecyclyBinItem, Get-PnPRecyclyBinItem, Move-PnPRecyclyBinItem, Restore-PnPRecyclyBinItem, Restore-PnPTenantRecyclyBinItem cmdlets
+* Added Move-PnPFolder, Rename-PnPFolder cmdlets
+* Added Add-PnPPublishingImageRendition, Get-PnPPublishingImageRendition and Remove-PnPPublishingImageRendition cmdlets
+* Refactored Get-PnPFile. ServerRelativeUrl and SiteRelativeUrl are now obsolete (but will still work), use the Url parameter instead which takes either a server or site relative url.
+
+**2016-11-21**
+* Added support to enable versionining and set the maximum number of versions to keep on a list and library with Set-PnPList
+* Updated Add-PnPUserToGroup to allow to send invites to external users
+
+**2016-11-09**
+* Added Set-PnPUnifiedGroup cmdlet
+
+**2016-11-01**
+* Exposed ResetSubwebsToInherit and UpdateRootwebOnly parameters to Set-PnPTheme.
+
+**2016-10-29**
+* Marked Get-SPOSite as deprecated. We will remove this cmdlet in the January 2017 release. Please switch as soon as possible to Get-PnPSite instead. A warning will be shown the moment Get-SPOSite is used.
+* Renamed all cmdlet verbs from -SPO* to -PnP*. From now all cmdlets follow the *Verb*-PnP*Noun* pattern. There are corresponding aliases available now that allow existing scripts to continue to work.
+
+**2016-10-19**
+* Added Get-SPOProvisioningTemplateFromGallery cmdlet
+
+**2016-10-13**
+* Added Get-SPOFolder cmdlet
+* Minor update to Set-SPOListItem
+* Added attributes to Get-SPOFile
+* Added return type to generated documentation for those cmdlets that return an object or value
+
+**2016-10-01**
+* Added Load-SPOPRovisioningTemplate
+* Added Save-SPOProvisioningTemplate
+
+**2016-09-29**
+* Live from MS Ignite: Added Remove-SPOTaxonomyItem cmdlet
+* Live from MS Ignite: Added Remove-SPOTermGroup cmdlet
+
+**2016-06-03**
+* Added Add-SPODocumentSet cmdlet
+
+**2016-06-02**
+* Added Enable-SPOResponsiveUI and Disable-SPOResponsiveUI cmdlets
+* Added -CreateDrive parameter to Connect-SPOnline cmdlet, allowing to create a virtual drive into a SharePoint site
+* Added Invoke-SPOWebAction cmdlet
+
+**2016-05-09**
+* Namespace, Assembly and Project rename from OfficeDevPnP.PowerShell to SharePointPnP.PowerShell
+
+**2016-04-08**
+* Added -ExtensibilityHandlers parameter to Get-SPOPRovisioningTemplate
+
+**2016-03-11**
+* Added List parameter to Get-SPOContentType, allowing to retrieve the ContentTypes added to a list.
+
+**2016-03-08**
+* Added Remove-SPOListItem
+* Updated Get-SPOWeb and Get-SPOSubWebs to include ServerRelativeUrl
+* Added Ensure-SPOFolder cmdlet
+
+**2016-03-07**
+* Added Remove-SPOFieldFromContentType cmdlet
+* Added Get-SPOSiteSearchQueryResults cmdlet
+
+**2016-02-04**
+* Added -PersistPublishingFiles and -IncludeNativePublishingFiles parameters to Get-SPOProvisioningTemplate
+
+**2016-02-03 **
+* Added -ExcludedHandlers attribute to Apply-SPOProvisioningTemplate and Get-SPOPRovisioningTemplate
+**2016-02-01**
+
+* Added Convert-SPOProvisioningTemplate cmdlet
+
+**2015-12-26**
+
+* Added -AsIncludeFile parameter to New-SPOProvisioningTemplateFromFolder
+
+**2015-12-21**
+
+* Added a Set-SPOContext cmdlet
+
+**2015-12-14**
+
+* Added Set-SPOListItem cmdlet
+
+**2015-11-21**
+
+* Added, where applicable, Site Relative Url parameters, besides the existing Server Relative Url parameters on cmdlets.
+* Implemented the use of PnP Monitored Scope. Turn on the trace log with Set-SPOTraceLog -On -Level Information -LogFile c:\pathtoyourlogfile.log to see the tracelog.
+* Added a Get-SPOTheme cmdlet
+
+**2015-10-26**
+
+* Added New-SPOProvisioningTemplateFromFolder cmdlet
+
+**2015-10-14**
+
+* Added optional -Encoding parameter to Export-SPOTaxonomy
+
+**2015-09-23**
+
+* Update Get-SPOSearchConfiguration and Set-SPOSearchConfiguration to support Path parameter to export to or import from a file
+
+**2015-09-21**
+
+* Added -Parameters parameter to Apply-SPOProvisioningTemplate. See help for the cmdlet for more info.
+* Renamed PageUrl parameter of Webpart cmdlets to ServerRelativePageUrl. Set PageUrl as parameter alias to not break existing scripts.
+
+**2015-09-17**
+
+* Added Get-SPOProperty to dynamically load specified properties from objects.
+
+**2015-09-10**
+
+* Renamed Path parameter of Set-SPOHomePage to RootFolderRelativeUrl. Set Path as parameter alias.
+
+**2015-09-02**
+
+* Started adding unit tests
+* Added warning when using Install-SPOSolution to documentation. The cmdlet can potentially clear the composed look gallery.
+
+**2015-08-18**
+
+* Added Set-SPOTraceLog cmdlet
+
+**2015-08-15**
+
+* Added -Recurse parameter to Get-SPOSubWebs cmdlet to recursively retrieve all subwebs
+
+**2015-08-14**
+
+* Modified Connect-SPOnline to output version number when specifying -Verbose parameter
 
 **2015-08-10**
 

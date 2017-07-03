@@ -1,25 +1,43 @@
-﻿using OfficeDevPnP.PowerShell.Commands.Base.PipeBinds;
-using Microsoft.SharePoint.Client;
-using System;
-using System.Linq;
-using System.Management.Automation;
+﻿using System;
 using System.Collections.Generic;
-using OfficeDevPnP.PowerShell.CmdletHelpAttributes;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Management.Automation;
+using Microsoft.SharePoint.Client;
+using SharePointPnP.PowerShell.CmdletHelpAttributes;
+using SharePointPnP.PowerShell.Commands.Base;
+using SharePointPnP.PowerShell.Commands.Base.PipeBinds;
 
-namespace OfficeDevPnP.PowerShell.Commands
+namespace SharePointPnP.PowerShell.Commands.Lists
 {
-    [Cmdlet(VerbsCommon.Get, "SPOView")]
-    [CmdletHelp("Returns one or all views from a list", Category = "Lists")]
-    public class GetView : SPOWebCmdlet
+    [Cmdlet(VerbsCommon.Get, "PnPView")]
+    [CmdletHelp("Returns one or all views from a list",
+        Category = CmdletHelpCategory.Lists,
+        OutputType = typeof(View),
+        OutputTypeLink = "https://msdn.microsoft.com/en-us/library/microsoft.sharepoint.client.view.aspx")]
+    [CmdletExample(
+        Code = @"Get-PnPView -List ""Demo List""",
+        Remarks = @"Returns all views associated from the specified list",
+        SortOrder = 1)]
+    [CmdletExample(
+        Code = @"Get-PnPView -List ""Demo List"" -Identity ""Demo View""",
+        Remarks = @"Returns the view called ""Demo View"" from the specified list",
+        SortOrder = 2)]
+    [CmdletExample(
+        Code = @"Get-PnPView -List ""Demo List"" -Identity ""5275148a-6c6c-43d8-999a-d2186989a661""",
+        Remarks = @"Returns the view with the specified ID from the specified list",
+        SortOrder = 3)]
+    public class GetView : PnPWebRetrievalsCmdlet<View>
     {
         [Parameter(Mandatory = true, ValueFromPipeline = true, Position = 0, HelpMessage = "The ID or Url of the list.")]
         public ListPipeBind List;
 
-        [Parameter(Mandatory = false)]
+        [Parameter(Mandatory = false, HelpMessage = "The ID or name of the view")]
         public ViewPipeBind Identity;
 
         protected override void ExecuteCmdlet()
         {
+            DefaultRetrievalExpressions = new Expression<Func<View, object>>[] { v => v.Id, v => v.Title, v => v.ServerRelativeUrl, v => v.DefaultView, v => v.PersonalView, v => v.ViewFields };
 
             if (List != null)
             {
@@ -32,23 +50,25 @@ namespace OfficeDevPnP.PowerShell.Commands
                     {
                         if (Identity.Id != Guid.Empty)
                         {
-                            view = list.GetViewById(Identity.Id);
-                            
+                            view = list.GetViewById(Identity.Id, RetrievalExpressions);
+                            view.EnsureProperties(RetrievalExpressions);
+
                         }
                         else if (!string.IsNullOrEmpty(Identity.Title))
                         {
-                            view = list.GetViewByName(Identity.Title);
+                            view = list.GetViewByName(Identity.Title, RetrievalExpressions);
+                            view.EnsureProperties(RetrievalExpressions);
                         }
                     }
                     else
                     {
-                        views = ClientContext.LoadQuery(list.Views.IncludeWithDefaultProperties(v => v.ViewFields));
+                        views = ClientContext.LoadQuery(list.Views.IncludeWithDefaultProperties(RetrievalExpressions));
                         ClientContext.ExecuteQueryRetry();
-                        
+
                     }
                     if (views != null && views.Any())
                     {
-                        WriteObject(views,true);
+                        WriteObject(views, true);
                     }
                     else if (view != null)
                     {

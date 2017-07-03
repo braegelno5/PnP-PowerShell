@@ -1,13 +1,13 @@
 ﻿using Microsoft.SharePoint.Client;
 using Microsoft.SharePoint.Client.DocumentSet;
 
-namespace OfficeDevPnP.PowerShell.Commands.Base.PipeBinds
+namespace SharePointPnP.PowerShell.Commands.Base.PipeBinds
 {
     public sealed class DocumentSetPipeBind
     {
         private readonly string _id;
         private readonly string _name;
-        private readonly ContentType _contentType;
+        private ContentType _contentType;
         private readonly DocumentSetTemplate _documentSetTemplate;
 
         public DocumentSetPipeBind()
@@ -56,18 +56,9 @@ namespace OfficeDevPnP.PowerShell.Commands.Base.PipeBinds
             }
         }
 
-        public string Name
-        {
-            get
-            {
-                return _name;
-            }
-        }
+        public string Name => _name;
 
-        public ContentType ContentType
-        {
-            get { return _contentType; }
-        }
+        public ContentType ContentType => _contentType;
 
         public DocumentSetTemplate GetDocumentSetTemplate(Web web)
         {
@@ -92,6 +83,7 @@ namespace OfficeDevPnP.PowerShell.Commands.Base.PipeBinds
                 {
                     ct = web.GetContentTypeByName(Name, true);
                 }
+                _contentType = ct;
                 var docSet = DocumentSetTemplate.GetDocumentSetTemplate(web.Context, ct);
                 return docSet;
             }

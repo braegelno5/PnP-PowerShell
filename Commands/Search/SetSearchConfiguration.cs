@@ -2,41 +2,58 @@
 using System.Management.Automation;
 using Microsoft.SharePoint.Client;
 using Microsoft.SharePoint.Client.Search.Administration;
-using OfficeDevPnP.PowerShell.CmdletHelpAttributes;
-using OfficeDevPnP.PowerShell.Commands.Enums;
-using Resources = OfficeDevPnP.PowerShell.Commands.Properties.Resources;
+using SharePointPnP.PowerShell.CmdletHelpAttributes;
+using SharePointPnP.PowerShell.Commands.Enums;
+using Resources = SharePointPnP.PowerShell.Commands.Properties.Resources;
 
-namespace OfficeDevPnP.PowerShell.Commands.Search
+namespace SharePointPnP.PowerShell.Commands.Search
 {
-    [Cmdlet(VerbsCommon.Set, "SPOSearchConfiguration")]
-    [CmdletHelp("Returns the search configuration", Category = "Search")]
+    [Cmdlet(VerbsCommon.Set, "PnPSearchConfiguration")]
+    [CmdletHelp("Sets the search configuration",
+        Category = CmdletHelpCategory.Search)]
     [CmdletExample(
-        Code = @"PS:> Set-SPOSearchConfiguration -Configuration $config",
+        Code = @"PS:> Set-PnPSearchConfiguration -Configuration $config",
         Remarks = "Sets the search configuration for the current web",
         SortOrder = 1)]
     [CmdletExample(
-        Code = @"PS:> Set-SPOSearchConfiguration -Configuration $config -Scope Site",
+        Code = @"PS:> Set-PnPSearchConfiguration -Configuration $config -Scope Site",
         Remarks = "Sets the search configuration for the current site collection",
         SortOrder = 2)]
     [CmdletExample(
-        Code = @"PS:> Set-SPOSearchConfiguration -Configuration $config -Scope Subscription",
+        Code = @"PS:> Set-PnPSearchConfiguration -Configuration $config -Scope Subscription",
         Remarks = "Sets the search configuration for the current tenant",
         SortOrder = 3)]
-    public class SetSearchConfiguration : SPOWebCmdlet
+    [CmdletExample(
+          Code = @"PS:> Set-PnPSearchConfiguration -Path searchconfig.xml -Scope Subscription",
+        Remarks = "Reads the search configuration from the specified XML file and sets it for the current tenant",
+        SortOrder = 4)]
+
+    public class SetSearchConfiguration : PnPWebCmdlet
     {
-        [Parameter(Mandatory = true)]
+        [Parameter(Mandatory = true, ParameterSetName = "Config", HelpMessage = "Search configuration string")]
         public string Configuration;
 
-        [Parameter(Mandatory = false)]
+        [Parameter(Mandatory = true, ParameterSetName = "Path", HelpMessage = "Path to a search configuration")]
+        public string Path;
+
+        [Parameter(Mandatory = false, ParameterSetName = ParameterAttribute.AllParameterSets)]
         public SearchConfigurationScope Scope = SearchConfigurationScope.Web;
 
         protected override void ExecuteCmdlet()
         {
+            if (ParameterSetName == "Path")
+            {
+                if (!System.IO.Path.IsPathRooted(Path))
+                {
+                    Path = System.IO.Path.Combine(SessionState.Path.CurrentFileSystemLocation.Path, Path);
+                }
+                Configuration = System.IO.File.ReadAllText(Path);
+            }
             switch (Scope)
             {
                 case SearchConfigurationScope.Web:
                     {
-                        this.SelectedWeb.SetSearchConfiguration(Configuration);
+                        SelectedWeb.SetSearchConfiguration(Configuration);
                         break;
                     }
                 case SearchConfigurationScope.Site:
@@ -51,7 +68,7 @@ namespace OfficeDevPnP.PowerShell.Commands.Search
                             throw new InvalidOperationException(Resources.CurrentSiteIsNoTenantAdminSite);
                         }
 
-                        ClientContext.ImportSearchSettings(Configuration, SearchObjectLevel.SPSiteSubscription);
+                        ClientContext.ImportSearchSettings(Path, SearchObjectLevel.SPSiteSubscription);
                         break;
                     }
             }

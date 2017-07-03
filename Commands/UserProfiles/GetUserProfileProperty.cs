@@ -1,25 +1,28 @@
 ﻿using System.Management.Automation;
 using Microsoft.SharePoint.Client;
 using Microsoft.SharePoint.Client.UserProfiles;
-using OfficeDevPnP.PowerShell.CmdletHelpAttributes;
-using OfficeDevPnP.PowerShell.Commands.Base;
+using SharePointPnP.PowerShell.CmdletHelpAttributes;
+using SharePointPnP.PowerShell.Commands.Base;
 
-namespace OfficeDevPnP.PowerShell.Commands.UserProfiles
+namespace SharePointPnP.PowerShell.Commands.UserProfiles
 {
-    [Cmdlet(VerbsCommon.Get, "SPOUserProfileProperty")]
-    [CmdletHelp(@"Office365 only: Uses the tenant API to retrieve site information.
-
-You must connect to the admin website (https://:<tenant>-admin.sharepoint.com) with Connect-SPOnline in order to use this command. 
-", DetailedDescription = "Requires a connection to a SharePoint Tenant Admin site.", Category = "User Profiles")]
+    [Cmdlet(VerbsCommon.Get, "PnPUserProfileProperty")]
+#if !ONPREMISES
+    [CmdletHelp(@"You must connect to the tenant admin website (https://:<tenant>-admin.sharepoint.com) with Connect-PnPOnline in order to use this cmdlet. 
+", DetailedDescription = "Requires a connection to a SharePoint Tenant Admin site.", 
+        Category = CmdletHelpCategory.UserProfiles,
+         OutputType = typeof(PersonProperties),
+        OutputTypeLink = "https://msdn.microsoft.com/en-us/library/microsoft.sharepoint.client.userprofiles.personproperties.aspx")]
+#endif
     [CmdletExample(
-        Code = @"PS:> Get-SPOUserProfileProperty -Account 'user@domain.com'", 
+        Code = @"PS:> Get-PnPUserProfileProperty -Account 'user@domain.com'", 
         Remarks = "Returns the profile properties for the specified user",
         SortOrder = 1)]
     [CmdletExample(
-        Code = @"PS:> Get-SPOUserProfileProperty -Account 'user@domain.com','user2@domain.com'", 
+        Code = @"PS:> Get-PnPUserProfileProperty -Account 'user@domain.com','user2@domain.com'", 
         Remarks = "Returns the profile properties for the specified users",
         SortOrder = 1)]
-    public class GetUserProfileProperty : SPOAdminCmdlet
+    public class GetUserProfileProperty : PnPAdminCmdlet
     {
         [Parameter(Mandatory = true, HelpMessage = "The account of the user, formatted either as a login name, or as a claims identity, e.g. i:0#.f|membership|user@domain.com", Position = 0)]
         public string[] Account;
@@ -30,9 +33,14 @@ You must connect to the admin website (https://:<tenant>-admin.sharepoint.com) w
 
             foreach (var acc in Account)
             {
-                var result = Tenant.EncodeClaim(acc);
+                var currentAccount = acc;
+#if !ONPREMISES
+                var result = Tenant.EncodeClaim(currentAccount);
                 ClientContext.ExecuteQueryRetry();
-                var properties = peopleManager.GetPropertiesFor(result.Value);
+                currentAccount = result.Value;
+#endif
+
+                var properties = peopleManager.GetPropertiesFor(currentAccount);
                 ClientContext.Load(properties);
                 ClientContext.ExecuteQueryRetry();
                 WriteObject(properties);

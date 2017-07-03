@@ -1,6 +1,6 @@
 ﻿using Microsoft.SharePoint.Client;
 
-namespace OfficeDevPnP.PowerShell.Commands.Base.PipeBinds
+namespace SharePointPnP.PowerShell.Commands.Base.PipeBinds
 {
     public sealed class ContentTypePipeBind
     {
@@ -48,18 +48,9 @@ namespace OfficeDevPnP.PowerShell.Commands.Base.PipeBinds
             }
         }
 
-        public string Name
-        {
-            get
-            {
-                return _name;
-            }
-        }
+        public string Name => _name;
 
-        public ContentType ContentType
-        {
-            get { return _contentType; }
-        }
+        public ContentType ContentType => _contentType;
 
         public ContentType GetContentType(Web web)
         {

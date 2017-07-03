@@ -1,7 +1,7 @@
 ﻿using Microsoft.SharePoint.Client;
 using System;
 
-namespace OfficeDevPnP.PowerShell.Commands.Base.PipeBinds
+namespace SharePointPnP.PowerShell.Commands.Base.PipeBinds
 {
     public class ViewPipeBind
     {
@@ -34,22 +34,10 @@ namespace OfficeDevPnP.PowerShell.Commands.Base.PipeBinds
             }
         }
 
-        public Guid Id
-        {
-            get { return _id; }
-        }
+        public Guid Id => _id;
 
-        public View View
-        {
-            get
-            {
-                return _view;
-            }
-        }
+        public View View => _view;
 
-        public string Title
-        {
-            get { return _name; }
-        }
+        public string Title => _name;
     }
 }

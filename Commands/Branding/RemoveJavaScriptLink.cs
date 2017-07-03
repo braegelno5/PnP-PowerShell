@@ -1,58 +1,82 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Management.Automation;
 using Microsoft.SharePoint.Client;
-using OfficeDevPnP.PowerShell.CmdletHelpAttributes;
-using OfficeDevPnP.PowerShell.Commands.Enums;
-using Resources = OfficeDevPnP.PowerShell.Commands.Properties.Resources;
+using SharePointPnP.PowerShell.CmdletHelpAttributes;
+using SharePointPnP.PowerShell.Commands.Enums;
+using Resources = SharePointPnP.PowerShell.Commands.Properties.Resources;
 
-namespace OfficeDevPnP.PowerShell.Commands
+namespace SharePointPnP.PowerShell.Commands.Branding
 {
-    [Cmdlet(VerbsCommon.Remove, "SPOJavaScriptLink", SupportsShouldProcess = true)]
-    [CmdletHelp("Removes a JavaScript link or block from a web or sitecollection", Category = "Branding")]
-    public class RemoveJavaScriptLink : SPOWebCmdlet
+    [Cmdlet(VerbsCommon.Remove, "PnPJavaScriptLink", SupportsShouldProcess = true)]
+    [CmdletHelp("Removes a JavaScript link or block from a web or sitecollection",
+        Category = CmdletHelpCategory.Branding)]
+    [CmdletExample(Code = "PS:> Remove-PnPJavaScriptLink -Name jQuery",
+                Remarks = "Removes the injected JavaScript file with the name jQuery from the current web after confirmation",
+                SortOrder = 1)]
+    [CmdletExample(Code = "PS:> Remove-PnPJavaScriptLink -Name jQuery -Scope Site",
+                Remarks = "Removes the injected JavaScript file with the name jQuery from the current site collection after confirmation",
+                SortOrder = 2)]
+    [CmdletExample(Code = "PS:> Remove-PnPJavaScriptLink -Name jQuery -Scope Site -Force",
+                Remarks = "Removes the injected JavaScript file with the name jQuery from the current site collection and will not ask for confirmation",
+                SortOrder = 3)]
+    [CmdletExample(Code = "PS:> Remove-PnPJavaScriptLink -Scope Site",
+                Remarks = "Removes all the injected JavaScript files with from the current site collection after confirmation for each of them",
+                SortOrder = 4)]
+    public class RemoveJavaScriptLink : PnPWebCmdlet
     {
-        [Parameter(Mandatory = true, ValueFromPipeline = true, Position = 0, HelpMessage = "Name of the Javascript link. Omit this parameter to retrieve all script links")]
+        [Parameter(Mandatory = false, ValueFromPipeline = true, Position = 0, HelpMessage = "Name of the JavaScriptLink to remove. Omit if you want to remove all JavaScript Links.")]
         [Alias("Key")]
         public string Name = string.Empty;
 
-        [Parameter(Mandatory = false, DontShow = true)]
+        [Parameter(Mandatory = false)]
+        [Obsolete("Use Scope parameter")]
         public SwitchParameter FromSite;
 
-        [Parameter(Mandatory = false)]
+        [Parameter(Mandatory = false, HelpMessage = "Use the -Force flag to bypass the confirmation question")]
         public SwitchParameter Force;
 
-        [Parameter(Mandatory = false)]
+        [Parameter(Mandatory = false, HelpMessage = "Define if the JavaScriptLink is to be found at the web or site collection scope. Specify All to allow deletion from either web or site collection.")]
         public CustomActionScope Scope = CustomActionScope.Web;
 
         protected override void ExecuteCmdlet()
         {
-
             // Following code to handle desprecated parameter
-            CustomActionScope setScope;
-
             if (MyInvocation.BoundParameters.ContainsKey("FromSite"))
             {
-                setScope = CustomActionScope.Site;
-            }
-            else
-            {
-                setScope = Scope;
+                Scope = CustomActionScope.Site;
             }
 
-            var action = setScope == CustomActionScope.Web ? SelectedWeb.GetCustomActions().FirstOrDefault(c => c.Name == Name) : ClientContext.Site.GetCustomActions().FirstOrDefault(c => c.Name == Name);
-            if (action != null)
+            List<UserCustomAction> actions = new List<UserCustomAction>();
+
+            if (Scope == CustomActionScope.All || Scope == CustomActionScope.Web)
             {
-                if (Force || ShouldContinue(string.Format(Resources.RemoveJavaScript0,action.Name), Resources.Confirm))
+                actions.AddRange(SelectedWeb.GetCustomActions().Where(c => c.Location == "ScriptLink"));
+            }
+            if (Scope == CustomActionScope.All || Scope == CustomActionScope.Site)
+            {
+                actions.AddRange(ClientContext.Site.GetCustomActions().Where(c => c.Location == "ScriptLink"));
+            }
+
+            if (!actions.Any()) return;
+
+            if(!string.IsNullOrEmpty(Name))
+            {
+                actions = actions.Where(action => action.Name == Name).ToList();
+            }
+
+            foreach (var action in actions.Where(action => Force || ShouldContinue(string.Format(Resources.RemoveJavaScript0, action.Name), Resources.Confirm)))
+            {
+                switch (action.Scope)
                 {
-                    if (setScope == CustomActionScope.Web)
-                    {
-                        SelectedWeb.DeleteJsLink(Name);
-                    }
-                    else
-                    {
-                        var site = ClientContext.Site;
-                        site.DeleteJsLink(Name);
-                    }
+                    case UserCustomActionScope.Web:
+                        SelectedWeb.DeleteJsLink(action.Name);
+                        break;
+
+                    case UserCustomActionScope.Site:
+                        ClientContext.Site.DeleteJsLink(action.Name);
+                        break;
                 }
             }
         }

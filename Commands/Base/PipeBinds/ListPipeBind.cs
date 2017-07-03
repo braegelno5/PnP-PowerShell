@@ -1,7 +1,7 @@
 ﻿using Microsoft.SharePoint.Client;
 using System;
 
-namespace OfficeDevPnP.PowerShell.Commands.Base.PipeBinds
+namespace SharePointPnP.PowerShell.Commands.Base.PipeBinds
 {
     public sealed class ListPipeBind
     {
@@ -34,22 +34,15 @@ namespace OfficeDevPnP.PowerShell.Commands.Base.PipeBinds
             }
         }
 
-        public Guid Id
-        {
-            get { return _id; }
-        }
+        public Guid Id => _id;
 
-        public List List
-        {
-            get
-            {
-                return _list;
-            }
-        }
+        public List List => _list;
 
-        public string Title
+        public string Title => _name;
+
+        public override string ToString()
         {
-            get { return _name; }
+            return Title ?? Id.ToString();
         }
 
         internal List GetList(Web web)
@@ -73,7 +66,7 @@ namespace OfficeDevPnP.PowerShell.Commands.Base.PipeBinds
             }
             if (list != null)
             {
-                web.Context.Load(list, l => l.Id, l => l.BaseTemplate, l => l.OnQuickLaunch, l => l.DefaultViewUrl, l => l.Title, l => l.Hidden, l => l.ContentTypesEnabled);
+                web.Context.Load(list, l => l.Id, l => l.BaseTemplate, l => l.OnQuickLaunch, l => l.DefaultViewUrl, l => l.Title, l => l.Hidden, l => l.ContentTypesEnabled, l => l.RootFolder.ServerRelativeUrl);
                 web.Context.ExecuteQueryRetry();
             }
             return list;

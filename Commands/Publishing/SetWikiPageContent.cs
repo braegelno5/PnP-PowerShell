@@ -2,14 +2,15 @@
 using System.IO;
 using System.Management.Automation;
 using Microsoft.SharePoint.Client;
-using OfficeDevPnP.PowerShell.CmdletHelpAttributes;
+using SharePointPnP.PowerShell.CmdletHelpAttributes;
 using File = System.IO.File;
 
-namespace OfficeDevPnP.PowerShell.Commands
+namespace SharePointPnP.PowerShell.Commands.Publishing
 {
-    [Cmdlet(VerbsCommon.Set, "SPOWikiPageContent")]
-    [CmdletHelp("Sets the contents of a wikipage", Category = "Publishing")]
-    public class SetWikiPageContent : SPOWebCmdlet
+    [Cmdlet(VerbsCommon.Set, "PnPWikiPageContent")]
+    [CmdletHelp("Sets the contents of a wikipage",
+        Category = CmdletHelpCategory.Publishing)]
+    public class SetWikiPageContent : PnPWebCmdlet
     {
         [Parameter(Mandatory = true, ParameterSetName = "STRING")]
         public string Content = string.Empty;
@@ -17,8 +18,8 @@ namespace OfficeDevPnP.PowerShell.Commands
         [Parameter(Mandatory = true, ParameterSetName = "FILE")]
         public string Path = string.Empty;
 
-        [Parameter(Mandatory = true, ParameterSetName = "FILE", HelpMessage="Site Relative Page Url")]
-        [Parameter(Mandatory = true, ParameterSetName = "STRING", HelpMessage="Site Relative Page Url")]
+        [Parameter(Mandatory = true, ParameterSetName = "FILE", HelpMessage = "Site Relative Page Url")]
+        [Parameter(Mandatory = true, ParameterSetName = "STRING", HelpMessage = "Site Relative Page Url")]
         [Alias("PageUrl")]
         public string ServerRelativePageUrl = string.Empty;
 
@@ -39,7 +40,7 @@ namespace OfficeDevPnP.PowerShell.Commands
                 }
                 else
                 {
-                    throw new Exception(string.Format("File {0} does not exist",Path));
+                    throw new Exception($"File {Path} does not exist");
                 }
             }
             else

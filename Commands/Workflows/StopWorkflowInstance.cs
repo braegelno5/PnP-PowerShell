@@ -2,15 +2,16 @@
 using System.Linq;
 using System.Management.Automation;
 using Microsoft.SharePoint.Client;
-using OfficeDevPnP.PowerShell.CmdletHelpAttributes;
-using OfficeDevPnP.PowerShell.Commands.Base.PipeBinds;
+using SharePointPnP.PowerShell.CmdletHelpAttributes;
+using SharePointPnP.PowerShell.Commands.Base.PipeBinds;
 
-namespace OfficeDevPnP.PowerShell.Commands.Workflows
+namespace SharePointPnP.PowerShell.Commands.Workflows
 {
-    [Cmdlet(VerbsLifecycle.Stop, "SPOWorkflowInstance")]
-    [CmdletHelp("Stops a workflow instance", Category = "Workflows")]
+    [Cmdlet(VerbsLifecycle.Stop, "PnPWorkflowInstance")]
+    [CmdletHelp("Stops a workflow instance",
+        Category = CmdletHelpCategory.Workflows)]
 
-    public class StopWorkflowInstance : SPOWebCmdlet
+    public class StopWorkflowInstance : PnPWebCmdlet
     {
         [Parameter(Mandatory = true, HelpMessage = "The instance to stop", Position = 0)]
         public WorkflowInstancePipeBind Identity;

@@ -1,15 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Management.Automation;
+﻿using System.Management.Automation;
 using Microsoft.SharePoint.Client;
-using OfficeDevPnP.PowerShell.CmdletHelpAttributes;
+using SharePointPnP.PowerShell.CmdletHelpAttributes;
 
-namespace OfficeDevPnP.PowerShell.Commands
+namespace SharePointPnP.PowerShell.Commands
 {
-    [Cmdlet(VerbsCommon.Add, "SPOIndexedProperty")]
-    [CmdletHelp("Marks the value of the propertybag key to be indexed by search.", Category = "Webs")]
-    public class AddIndexedProperty : SPOWebCmdlet
+    [Cmdlet(VerbsCommon.Add, "PnPIndexedProperty")]
+    [CmdletHelp("Marks the value of the propertybag key specified to be indexed by search.",
+        Category = CmdletHelpCategory.Webs)]
+    public class AddIndexedProperty : PnPWebCmdlet
     {
-        [Parameter(Mandatory = true, Position = 0)]
+        [Parameter(Mandatory = true, Position = 0, HelpMessage = @"Key of the property bag value to be indexed")]
         public string Key;
 
         protected override void ExecuteCmdlet()

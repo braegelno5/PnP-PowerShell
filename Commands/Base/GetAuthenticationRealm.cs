@@ -1,18 +1,26 @@
 ﻿using System;
 using System.Management.Automation;
-using OfficeDevPnP.PowerShell.CmdletHelpAttributes;
+using SharePointPnP.PowerShell.CmdletHelpAttributes;
 using System.Net;
+using Microsoft.SharePoint.Client;
 
-namespace OfficeDevPnP.PowerShell.Commands
+namespace SharePointPnP.PowerShell.Commands
 {
-    [Cmdlet(VerbsCommon.Get, "SPOAuthenticationRealm")]
-    [CmdletHelp("Gets the authentication realm for the current web", Category = "Base Cmdlets")]
-    [CmdletExample(Code = @"
-PS:> Get-SPOAuthenticationRealm -Url https://contoso.sharepoint.com", SortOrder = 1)]
-    public class GetAuthenticationRealm : SPOCmdlet
+    [Cmdlet(VerbsCommon.Get, "PnPAuthenticationRealm")]
+    [CmdletHelp("Gets the authentication realm for the current web", 
+        Category = CmdletHelpCategory.Base)]
+    [CmdletExample(
+        Code = @"PS:> Get-PnPAuthenticationRealm", 
+        Remarks = @"This will get the authentication realm for the current connected site",
+        SortOrder = 1)]
+    [CmdletExample(
+        Code = @"PS:> Get-PnPAuthenticationRealm -Url https://contoso.sharepoint.com",
+        Remarks = @"This will get the authentication realm for https://contoso.sharepoint.com",
+        SortOrder = 2)]
+    public class GetAuthenticationRealm : PnPCmdlet
     {
 
-        [Parameter(Mandatory = false, Position=0, ValueFromPipeline=true)]
+        [Parameter(Mandatory = false, Position=0, ValueFromPipeline=true, HelpMessage = "Specifies the URL of the site")]
         public string Url;
 
         protected override void ProcessRecord()
@@ -32,20 +40,10 @@ PS:> Get-SPOAuthenticationRealm -Url https://contoso.sharepoint.com", SortOrder 
             }
             catch (WebException e)
             {
-                if (e.Response == null)
-                {
-                }
-
                 var bearerResponseHeader = e.Response.Headers["WWW-Authenticate"];
-                if (string.IsNullOrEmpty(bearerResponseHeader))
-                {
-                }
 
                 const string bearer = "Bearer realm=\"";
                 var bearerIndex = bearerResponseHeader.IndexOf(bearer, StringComparison.Ordinal);
-                if (bearerIndex < 0)
-                {
-                }
 
                 var realmIndex = bearerIndex + bearer.Length;
 

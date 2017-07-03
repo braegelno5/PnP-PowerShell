@@ -1,28 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Management.Automation;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
-using OfficeDevPnP.Core.Framework.Provisioning.Providers.Json;
-using OfficeDevPnP.PowerShell.CmdletHelpAttributes;
+using SharePointPnP.PowerShell.CmdletHelpAttributes;
 
-namespace OfficeDevPnP.PowerShell.Commands.Base
+namespace SharePointPnP.PowerShell.Commands.Base
 {
-    [Cmdlet(VerbsCommon.Get, "SPOAzureADManifestKeyCredentials")]
-    [CmdletHelp("Creates the JSON snippet that is required for the manifest json file for Azure WebApplication / WebAPI apps", Category = "Base Cmdlets")]
+    [Cmdlet(VerbsCommon.Get, "PnPAzureADManifestKeyCredentials")]
+    [CmdletHelp("Creates the JSON snippet that is required for the manifest JSON file for Azure WebApplication / WebAPI apps", 
+        Category = CmdletHelpCategory.Base,
+        OutputType=typeof(string),
+        OutputTypeDescription = "Outputs a JSON formatted string")]
     [CmdletExample(
-        Code = @"PS:> Get-SPOAzureADManifestKeyCredentials -CertPath .\mycert.cer",
+        Code = @"PS:> Get-PnPAzureADManifestKeyCredentials -CertPath .\mycert.cer",
         Remarks = "Output the JSON snippet which needs to be replaced in the application manifest file", 
         SortOrder = 1)]
     [CmdletExample(
-        Code = @"PS:> Get-SPOAzureADManifestKeyCredentials -CertPath .\mycert.cer | Set-Clipboard",
+        Code = @"PS:> Get-PnPAzureADManifestKeyCredentials -CertPath .\mycert.cer | Set-Clipboard",
         Remarks = "Output the JSON snippet which needs to be replaced in the application manifest file and copies it to the clipboard",
         SortOrder = 2)]
     public class GetAzureADManifestKeyCredentials : PSCmdlet
     {
-        [Parameter(Mandatory = true)]
+        [Parameter(Mandatory = true, HelpMessage = @"Specifies the path to the certificate like .\mycert.cer")]
         public string CertPath;
 
         protected override void ProcessRecord()
@@ -43,7 +41,7 @@ namespace OfficeDevPnP.PowerShell.Commands.Base
 
             var keyId = Guid.NewGuid().ToString();
 
-            var output = string.Format("\"keyCredentials\": [\n\t{{\n\t\t\"customKeyIdentifier\": \"{0}\",\n\t\t\"keyId\": \"{1}\",\n\t\t\"type\": \"AsymmetricX509Cert\",\n\t\t\"usage\": \"Verify\",\n\t\t\"value\": \"{2}\"\n\t}}\n],", base64CertHash, keyId, base64Cert);
+            var output = $"\"keyCredentials\": [\n\t{{\n\t\t\"customKeyIdentifier\": \"{base64CertHash}\",\n\t\t\"keyId\": \"{keyId}\",\n\t\t\"type\": \"AsymmetricX509Cert\",\n\t\t\"usage\": \"Verify\",\n\t\t\"value\": \"{base64Cert}\"\n\t}}\n],";
 
             WriteObject(output);
 

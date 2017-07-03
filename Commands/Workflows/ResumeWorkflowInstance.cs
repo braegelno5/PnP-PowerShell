@@ -2,15 +2,16 @@
 using System.Linq;
 using System.Management.Automation;
 using Microsoft.SharePoint.Client;
-using OfficeDevPnP.PowerShell.CmdletHelpAttributes;
-using OfficeDevPnP.PowerShell.Commands.Base.PipeBinds;
+using SharePointPnP.PowerShell.CmdletHelpAttributes;
+using SharePointPnP.PowerShell.Commands.Base.PipeBinds;
 
-namespace OfficeDevPnP.PowerShell.Commands.Workflows
+namespace SharePointPnP.PowerShell.Commands.Workflows
 {
-    [Cmdlet(VerbsLifecycle.Resume, "SPOWorkflowInstance")]
-    [CmdletHelp("Resumes a previously stopped workflow instance", Category = "Workflows")]
+    [Cmdlet(VerbsLifecycle.Resume, "PnPWorkflowInstance")]
+    [CmdletHelp("Resumes a previously stopped workflow instance",
+        Category = CmdletHelpCategory.Workflows)]
 
-    public class ResumeWorkflowInstance : SPOWebCmdlet
+    public class ResumeWorkflowInstance : PnPWebCmdlet
     {
         [Parameter(Mandatory = true, HelpMessage = "The instance to resume", Position = 0)]
         public WorkflowInstancePipeBind Identity;

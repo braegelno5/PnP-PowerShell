@@ -1,25 +1,29 @@
-﻿using System.Management.Automation;
+﻿using System.Collections.Generic;
+using System.Management.Automation;
 using Microsoft.SharePoint.Client;
-using OfficeDevPnP.PowerShell.CmdletHelpAttributes;
-using OfficeDevPnP.PowerShell.Commands.Base.PipeBinds;
+using SharePointPnP.PowerShell.CmdletHelpAttributes;
+using SharePointPnP.PowerShell.Commands.Base.PipeBinds;
 
-namespace OfficeDevPnP.PowerShell.Commands.Principals
+namespace SharePointPnP.PowerShell.Commands.Principals
 {
-    [Cmdlet(VerbsCommon.Get, "SPOGroup",DefaultParameterSetName="All")]
-    [CmdletHelp("Returns a specific group or all groups.", Category = "User and group management")]
+    [Cmdlet(VerbsCommon.Get, "PnPGroup",DefaultParameterSetName="All")]
+    [CmdletHelp("Returns a specific group or all groups.",
+        Category = CmdletHelpCategory.Principals,
+        OutputType = typeof(List<Group>),
+        OutputTypeLink = "https://msdn.microsoft.com/en-us/library/microsoft.sharepoint.client.group.aspx")]
     [CmdletExample(
-        Code = @"PS:> Get-SPOGroup", 
+        Code = @"PS:> Get-PnPGroup", 
         Remarks = "Returns all groups",
         SortOrder = 1)]
     [CmdletExample(
-        Code = @"PS:> Get-SPOGroup -Identity 'My Site Users'", 
+        Code = @"PS:> Get-PnPGroup -Identity 'My Site Users'", 
         Remarks = "This will return the group called 'My Site Users' if available",
         SortOrder = 2)]
     [CmdletExample(
-        Code = @"PS:> Get-SPOGroup -AssociatedMemberGroup",
+        Code = @"PS:> Get-PnPGroup -AssociatedMemberGroup",
         Remarks = "This will return the current members group for the site",
         SortOrder = 3)]
-    public class GetGroup : SPOWebCmdlet
+    public class GetGroup : PnPWebRetrievalsCmdlet<Group>
     {
         [Parameter(Mandatory = false, Position = 0, ValueFromPipeline = true, ParameterSetName = "ByName", HelpMessage = "Get a specific group by name")]
         [Alias("Name")]

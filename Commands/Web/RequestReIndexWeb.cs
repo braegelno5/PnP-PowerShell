@@ -1,12 +1,13 @@
 ﻿using Microsoft.SharePoint.Client;
 using System.Management.Automation;
-using OfficeDevPnP.PowerShell.CmdletHelpAttributes;
+using SharePointPnP.PowerShell.CmdletHelpAttributes;
 
-namespace OfficeDevPnP.PowerShell.Commands
+namespace SharePointPnP.PowerShell.Commands
 {
-    [Cmdlet(VerbsLifecycle.Request, "SPOReIndexWeb")]
-    [CmdletHelp("Marks the web for full indexing during the next incremental crawl", Category = "Webs")]
-    public class RequestReIndexWeb : SPOWebCmdlet
+    [Cmdlet(VerbsLifecycle.Request, "PnPReIndexWeb")]
+    [CmdletHelp("Marks the web for full indexing during the next incremental crawl",
+        Category = CmdletHelpCategory.Webs)]
+    public class RequestReIndexWeb : PnPWebCmdlet
     {
 
         protected override void ExecuteCmdlet()

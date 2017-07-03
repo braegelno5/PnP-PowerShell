@@ -1,22 +1,27 @@
-﻿using OfficeDevPnP.PowerShell.Commands.Base.PipeBinds;
-using Microsoft.SharePoint.Client;
-using System;
+﻿using System;
 using System.Management.Automation;
-using OfficeDevPnP.PowerShell.CmdletHelpAttributes;
+using Microsoft.SharePoint.Client;
+using SharePointPnP.PowerShell.CmdletHelpAttributes;
+using SharePointPnP.PowerShell.Commands.Base.PipeBinds;
 
-namespace OfficeDevPnP.PowerShell.Commands
+namespace SharePointPnP.PowerShell.Commands.Lists
 {
-    [Cmdlet(VerbsCommon.Remove, "SPOView", SupportsShouldProcess = true)]
-    [CmdletHelp("Deletes a view from a list", Category = "Lists")]
-    public class RemoveView : SPOWebCmdlet
+    [Cmdlet(VerbsCommon.Remove, "PnPView", SupportsShouldProcess = true)]
+    [CmdletHelp("Deletes a view from a list",
+        Category = CmdletHelpCategory.Lists)]
+    [CmdletExample(
+        Code = @"PS:> Remove-PnPView -List ""Demo List"" -Identity ""All Items""",
+        SortOrder = 1,
+        Remarks = @"Removes the view with title ""All Items"" from the ""Demo List"" list.")]
+    public class RemoveView : PnPWebCmdlet
     {
-        [Parameter(Mandatory = true, ValueFromPipeline = true, Position = 0, HelpMessage = "The ID or Title of the list.")]
+        [Parameter(Mandatory = true, ValueFromPipeline = true, Position = 0, HelpMessage = "The ID or Title of the view.")]
         public ViewPipeBind Identity = new ViewPipeBind();
 
         [Parameter(Mandatory = true, ValueFromPipeline = true, Position = 1, HelpMessage = "The ID or Url of the list.")]
         public ListPipeBind List;
 
-        [Parameter(Mandatory = false)]
+        [Parameter(Mandatory = false, HelpMessage = "Specifying the Force parameter will skip the confirmation question.")]
         public SwitchParameter Force;
 
         protected override void ExecuteCmdlet()

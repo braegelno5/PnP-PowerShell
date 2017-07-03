@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace OfficeDevPnP.PowerShell.Commands.Base.PipeBinds
+namespace SharePointPnP.PowerShell.Commands.Base.PipeBinds
 {
     public class WebPartPipeBind
     {
@@ -20,12 +20,9 @@ namespace OfficeDevPnP.PowerShell.Commands.Base.PipeBinds
             }
         }
 
-        public Guid Id
-        {
-            get { return _id; }
-        }
+        public Guid Id => _id;
 
-        public string Title { get { return _title; } }
+        public string Title => _title;
 
         public WebPartPipeBind()
         {

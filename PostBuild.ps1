@@ -3,44 +3,123 @@ param($ProjectDir, $ConfigurationName, $TargetDir, $TargetFileName, $SolutionDir
 if($ConfigurationName -like "Debug*")
 {
 	$documentsFolder = [environment]::getfolderpath("mydocuments");
-
-	$PSModuleHome = "$documentsFolder\WindowsPowerShell\Modules\OfficeDevPnP.PowerShell.Commands"
-
+	if($ConfigurationName -like "Debug15")
+	{
+		$DestinationFolder = "$documentsFolder\WindowsPowerShell\Modules\SharePointPnPPowerShell2013"
+	} elseif($ConfigurationName -like "Debug16")
+	{
+		$DestinationFolder = "$documentsFolder\WindowsPowerShell\Modules\SharePointPnPPowerShell2016"
+	} else {
+		$DestinationFolder = "$documentsFolder\WindowsPowerShell\Modules\SharePointPnPPowerShellOnline"
+	}
+	
 	# Module folder there?
-	if(Test-Path $PSModuleHome)
+	if(Test-Path $DestinationFolder)
 	{
 		# Yes, empty it
-		Remove-Item $PSModuleHome\*
+		Remove-Item $DestinationFolder\*
 	} else {
 		# No, create it
-		New-Item -Path $PSModuleHome -ItemType Directory -Force >$null # Suppress output
+		Write-Host "Creating target folder: $DestinationFolder"
+		New-Item -Path $DestinationFolder -ItemType Directory -Force >$null # Suppress output
 	}
 
-	Write-Host "Copying files from $TargetDir to $PSModuleHome"
-	Copy-Item "$TargetDir\*.dll" -Destination "$PSModuleHome"
-	Copy-Item "$TargetDir\*help.xml" -Destination "$PSModuleHome"
-	Copy-Item "$TargetDir\ModuleFiles\*.psd1" -Destination  "$PSModuleHome"
-	Copy-Item "$TargetDir\ModuleFiles\*.ps1xml" -Destination "$PSModuleHome"
+	Write-Host "Copying files from $TargetDir to $DestinationFolder"
+	Try {
+		Copy-Item "$TargetDir\*.dll" -Destination "$DestinationFolder"
+		Copy-Item "$TargetDir\*help.xml" -Destination "$DestinationFolder"
+		switch($ConfigurationName)
+		{
+			"Debug15" {
+				Copy-Item "$TargetDir\ModuleFiles\SharePointPnPPowerShell2013.psd1" -Destination  "$DestinationFolder"
+				Copy-Item "$TargetDir\ModuleFiles\SharePointPnP.PowerShell.2013.Commands.Format.ps1xml" -Destination "$DestinationFolder"
+				if(Test-Path -Path "$TargetDir\ModuleFiles\SharePointPnPPowerShell2013Aliases.psm1")
+				{
+					Copy-Item "$TargetDir\ModuleFiles\SharePointPnPPowerShell2013Aliases.psm1" -Destination "$DestinationFolder"
+				}
+			} 
+			"Debug16" {
+				Copy-Item "$TargetDir\ModuleFiles\SharePointPnPPowerShell2016.psd1" -Destination  "$DestinationFolder"
+				Copy-Item "$TargetDir\ModuleFiles\SharePointPnP.PowerShell.2016.Commands.Format.ps1xml" -Destination "$DestinationFolder"
+				if(Test-Path -Path "$TargetDir\ModuleFiles\SharePointPnPPowerShell2016Aliases.psm1")
+				{
+					Copy-Item "$TargetDir\ModuleFiles\SharePointPnPPowerShell2016Aliases.psm1" -Destination "$DestinationFolder"
+				}
+			} 
+			"Debug" {
+				Copy-Item "$TargetDir\ModuleFiles\SharePointPnPPowerShellOnline.psd1" -Destination  "$DestinationFolder"
+				Copy-Item "$TargetDir\ModuleFiles\SharePointPnP.PowerShell.Online.Commands.Format.ps1xml" -Destination "$DestinationFolder"
+				if(Test-Path -Path "$TargetDir\ModuleFiles\SharePointPnPPowerShellOnlineAliases.psm1")
+				{
+					Copy-Item "$TargetDir\ModuleFiles\SharePointPnPPowerShellOnlineAliases.psm1" -Destination "$DestinationFolder"
+				}
+			}
+		}
+	}
+	Catch
+	{
+		exit 1
+	}
 } elseif ($ConfigurationName -like "Release*")
 {
-	$distDir = "$SolutionDir\dist";
-
-	# Dist folder there? If so, empty it.
-	if(Test-Path $distDir)
+    $documentsFolder = [environment]::getfolderpath("mydocuments");
+	switch($ConfigurationName)
 	{
-		Remove-Item $distDir\*
-	} else {
-		# Create folder
-		New-Item -Path "$distDir" -ItemType Directory -Force >$null # Suppress output
+		"Release15" 
+		{
+			$DestinationFolder = "$documentsFolder\WindowsPowerShell\Modules\SharePointPnPPowerShell2013"
+		}
+		"Release16"
+		{
+			$DestinationFolder = "$documentsFolder\WindowsPowerShell\Modules\SharePointPnPPowerShell2016"
+		}
+		"Release"
+		{
+			$DestinationFolder = "$documentsFolder\WindowsPowerShell\Modules\SharePointPnPPowerShellOnline"
+		}
 	}
-	# Copy files to 'dist' folder
-	Write-Host "Copying files from $TargetDir to $distDir"
-	Copy-Item "$TargetDir\*.dll" -Destination "$distDir"
-	Copy-Item "$TargetDir\*help.xml" -Destination "$distDir"
-	Copy-Item "$TargetDir\ModuleFiles\*.psd1" -Destination  "$distDir"
-	Copy-Item "$TargetDir\ModuleFiles\*.ps1xml" -Destination "$distDir"
-	Copy-Item "$SolutionDir\install.ps1" -Destination "$distDir"
-	ii $distDir
+
+	# Module folder there?
+	if(Test-Path $DestinationFolder)
+	{
+		# Yes, empty it
+		Remove-Item $DestinationFolder\*
+	} else {
+		# No, create it
+		Write-Host "Creating target folder: $DestinationFolder"
+		New-Item -Path $DestinationFolder -ItemType Directory -Force >$null # Suppress output
+	}
+
+	Write-Host "Copying files from $TargetDir to $DestinationFolder"
+	Try
+	{
+		Copy-Item "$TargetDir\*.dll" -Destination "$DestinationFolder"
+		Copy-Item "$TargetDir\*help.xml" -Destination "$DestinationFolder"
+		switch($ConfigurationName)
+		{
+			"Release15" {
+				Copy-Item "$TargetDir\ModuleFiles\SharePointPnPPowerShell2013.psd1" -Destination  "$DestinationFolder"
+				Copy-Item "$TargetDir\ModuleFiles\SharePointPnP.PowerShell.2013.Commands.Format.ps1xml" -Destination "$DestinationFolder"
+				Copy-Item "$TargetDir\ModuleFiles\SharePointPnPPowerShell2013Aliases.psm1" -Destination "$DestinationFolder"
+			} 
+			"Release16" {
+				Copy-Item "$TargetDir\ModuleFiles\SharePointPnPPowerShell2016.psd1" -Destination  "$DestinationFolder"
+				Copy-Item "$TargetDir\ModuleFiles\SharePointPnP.PowerShell.2016.Commands.Format.ps1xml" -Destination "$DestinationFolder"
+				Copy-Item "$TargetDir\ModuleFiles\SharePointPnPPowerShell2016Aliases.psm1" -Destination "$DestinationFolder"
+
+			} 
+			"Release" {
+				Copy-Item "$TargetDir\ModuleFiles\SharePointPnPPowerShellOnline.psd1" -Destination  "$DestinationFolder"
+				Copy-Item "$TargetDir\ModuleFiles\SharePointPnP.PowerShell.Online.Commands.Format.ps1xml" -Destination "$DestinationFolder"		
+				Copy-Item "$TargetDir\ModuleFiles\SharePointPnPPowerShellOnlineAliases.psm1" -Destination "$DestinationFolder"
+
+			}
+		}
+	} 
+	Catch
+	{
+		exit 1
+	}
 }
 
 	

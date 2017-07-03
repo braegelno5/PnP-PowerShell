@@ -1,22 +1,27 @@
 ﻿using System.Management.Automation;
 using Microsoft.SharePoint.Client;
 using OfficeDevPnP.Core;
-using OfficeDevPnP.PowerShell.CmdletHelpAttributes;
+using SharePointPnP.PowerShell.CmdletHelpAttributes;
 
-namespace OfficeDevPnP.PowerShell.Commands
+namespace SharePointPnP.PowerShell.Commands.Publishing
 {
-    [Cmdlet(VerbsCommon.Add, "SPOWikiPage")]
-    [CmdletHelp("Adds a wiki page", Category = "Publishing")]
-    public class AddWikiPage : SPOWebCmdlet
+    [Cmdlet(VerbsCommon.Add, "PnPWikiPage")]
+    [CmdletHelp("Adds a wiki page",
+        Category = CmdletHelpCategory.Publishing)]
+    [CmdletExample(
+        Code = @"PS:> Add-PnPWikiPage -PageUrl '/sites/demo1/pages/wikipage.aspx' -Content 'New WikiPage'",
+        Remarks = "Creates a new wiki page '/sites/demo1/pages/wikipage.aspx' and sets the content to 'New WikiPage'",
+        SortOrder = 1)]
+    public class AddWikiPage : PnPWebCmdlet
     {
-        [Parameter(Mandatory = true)]
+        [Parameter(Mandatory = true, HelpMessage = "The server relative page URL")]
         [Alias("PageUrl")]
         public string ServerRelativePageUrl = string.Empty;
 
-        [Parameter(Mandatory = false, ParameterSetName = "WithContent")]
+        [Parameter(Mandatory = true, ParameterSetName = "WithContent")]
         public string Content = null;
 
-        [Parameter(Mandatory = false, ParameterSetName = "WithLayout")]
+        [Parameter(Mandatory = true, ParameterSetName = "WithLayout")]
         public WikiPageLayout Layout;
 
         protected override void ExecuteCmdlet()

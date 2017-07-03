@@ -1,42 +1,51 @@
 ﻿using System.Management.Automation;
 using Microsoft.SharePoint.Client;
-using OfficeDevPnP.PowerShell.CmdletHelpAttributes;
-using OfficeDevPnP.PowerShell.Commands.Enums;
+using SharePointPnP.PowerShell.CmdletHelpAttributes;
+using SharePointPnP.PowerShell.Commands.Enums;
+using System;
 
-namespace OfficeDevPnP.PowerShell.Commands.Principals
+namespace SharePointPnP.PowerShell.Commands.Principals
 {
-    [Cmdlet("New", "SPOGroup")]
-    [CmdletHelp("Adds a user to the build-in Site User Info List and returns a user object", Category = "User and group management")]
+    [Cmdlet("New", "PnPGroup")]
+    [CmdletHelp("Adds group to the Site Groups List and returns a group object",
+        Category = CmdletHelpCategory.Principals,
+        OutputType = typeof(Group),
+        OutputTypeLink = "https://msdn.microsoft.com/en-us/library/microsoft.sharepoint.client.group.aspx")]
     [CmdletExample(
-        Code = @"PS:> New-SPOUser -LogonName user@company.com",
+        Code = @"PS:> New-PnPGroup -Title ""My Site Users""",
         SortOrder = 1)]
-    public class NewGroup : SPOWebCmdlet
+    public class NewGroup : PnPWebCmdlet
     {
-        [Parameter(Mandatory = true)]
+        [Parameter(Mandatory = true, HelpMessage = "The Title of the group")]
         public string Title = string.Empty;
 
-        [Parameter(Mandatory = false)]
+        [Parameter(Mandatory = false, HelpMessage = "The description for the group")]
         public string Description;
 
-        [Parameter(Mandatory = false)]
+        [Parameter(Mandatory = false, HelpMessage = "The owner for the group, which can be a user or another group")]
         public string Owner;
 
-        [Parameter(Mandatory = false)]
+        [Parameter(Mandatory = false, HelpMessage = "A switch parameter that specifies whether to allow users to request membership in the group and to allow users to request to leave the group")]
         public SwitchParameter AllowRequestToJoinLeave;
 
-        [Parameter(Mandatory = false)]
+        [Parameter(Mandatory = false, HelpMessage = "A switch parameter that specifies whether users are automatically added or removed when they make a request")]
         public SwitchParameter AutoAcceptRequestToJoinLeave;
 
-        [Parameter(Mandatory = false)]
+        [Parameter(Mandatory = false, HelpMessage = "A switch parameter that specifies whether group members can modify membership in the group")]
         public SwitchParameter AllowMembersEditMembership;
 
-        [Parameter(Mandatory = false)]
+        [Parameter(Mandatory = false, HelpMessage = "A switch parameter that specifies whether only group members are allowed to view the list of members in the group")]
+        [Obsolete("This is done by default. Use DisallowMembersViewMembership to disallow group members viewing membership")]
         public SwitchParameter OnlyAllowMembersViewMembership;
 
-        [Parameter(Mandatory = false)]
+        [Parameter(Mandatory = false, HelpMessage = "A switch parameter that disallows group members to view membership.")]
+        public SwitchParameter DisallowMembersViewMembership;
+
+        [Parameter(Mandatory = false, HelpMessage = "The e-mail address to which membership requests are sent")]
         public string RequestToJoinEmail;
 
-        [Parameter(Mandatory = false, DontShow = true)] // Not promoted to use anymore. Use Set-SPOGroup
+        [Parameter(Mandatory = false)] // Not promoted to use anymore. Use Set-PnPGroup
+        [Obsolete("Use Set-PnPGroup.")]
         public AssociatedGroupType SetAssociatedGroup = AssociatedGroupType.None;
 
         protected override void ExecuteCmdlet()
@@ -67,9 +76,16 @@ namespace OfficeDevPnP.PowerShell.Commands.Principals
                 group.AllowMembersEditMembership = true;
                 dirty = true;
             }
+#pragma warning disable 618
             if (OnlyAllowMembersViewMembership)
+#pragma warning restore 618
             {
                 group.OnlyAllowMembersViewMembership = true;
+                dirty = true;
+            }
+            if (DisallowMembersViewMembership)
+            {
+                group.OnlyAllowMembersViewMembership = false;
                 dirty = true;
             }
             if (!string.IsNullOrEmpty(RequestToJoinEmail))
@@ -105,7 +121,9 @@ namespace OfficeDevPnP.PowerShell.Commands.Principals
             }
 
 
+#pragma warning disable CS0618 // Type or member is obsolete
             if (SetAssociatedGroup != AssociatedGroupType.None)
+
             {
                 switch (SetAssociatedGroup)
                 {
@@ -126,6 +144,8 @@ namespace OfficeDevPnP.PowerShell.Commands.Principals
                         }
                 }
             }
+#pragma warning restore CS0618 // Type or member is obsolete
+
             ClientContext.ExecuteQueryRetry();
             WriteObject(group);
         }

@@ -1,34 +1,30 @@
-﻿using System.Management.Automation;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Management.Automation;
 using Microsoft.SharePoint.Client;
-using OfficeDevPnP.PowerShell.CmdletHelpAttributes;
-using OfficeDevPnP.PowerShell.Commands.Base.PipeBinds;
+using SharePointPnP.PowerShell.CmdletHelpAttributes;
+using SharePointPnP.PowerShell.Commands.Base.PipeBinds;
 
-namespace OfficeDevPnP.PowerShell.Commands
+namespace SharePointPnP.PowerShell.Commands.Apps
 {
-    [Cmdlet(VerbsCommon.Get, "SPOAppInstance")]
-    [CmdletHelp("Returns a SharePoint AddIn Instance", Category = "Apps")]
-    [CmdletExample(
-        Code = @"PS:> Get-SPOAppInstance",
-        Remarks = @"This will return all addin instances in the site.
- ", SortOrder = 1)]
-    [CmdletExample(
-        Code = @"PS:> Get-SPOnlineAppInstance -Identity 99a00f6e-fb81-4dc7-8eac-e09c6f9132fe",
-        Remarks = @"This will return an addin instance with the specified id.
-    ", SortOrder = 2)]
-    public class GetAppInstance : SPOWebCmdlet
+    [Cmdlet(VerbsCommon.Get, "PnPAppInstance")]
+    [CmdletHelp("Returns a SharePoint AddIn Instance in the site",
+        Category = CmdletHelpCategory.Apps,
+        OutputType = typeof(List<AppInstance>),
+        OutputTypeLink = "https://msdn.microsoft.com/en-us/library/microsoft.sharepoint.client.appinstance.aspx")]
+    [CmdletExample(Code = @"PS:> Get-PnPAppInstance", Remarks = @"This will return all addin instances in the site.", SortOrder = 1)]
+    [CmdletExample(Code = @"PS:> Get-PnPAppInstance -Identity 99a00f6e-fb81-4dc7-8eac-e09c6f9132fe", Remarks = @"This will return an addin instance with the specified id.", SortOrder = 2)]
+    public class GetAppInstance : PnPWebRetrievalsCmdlet<AppInstance>
     {
-
-        [Parameter(Mandatory = false, Position=0, ValueFromPipeline = true, HelpMessage = "The Id of the App Instance")]
-        public GuidPipeBind Identity;
+        [Parameter(Mandatory = false, Position=0, ValueFromPipeline = true, HelpMessage = "Specifies the Id of the App Instance")]
+        public AppPipeBind Identity;
 
         protected override void ExecuteCmdlet()
         {
-            
+
             if (Identity != null)
             {
-                var instance = SelectedWeb.GetAppInstanceById(Identity.Id);
-                ClientContext.Load(instance);
-                ClientContext.ExecuteQueryRetry();
+                var instance = Identity.GetAppInstance(SelectedWeb);
                 WriteObject(instance);
             }
             else
@@ -36,7 +32,7 @@ namespace OfficeDevPnP.PowerShell.Commands
                 var instances = SelectedWeb.GetAppInstances();
                 if (instances.Count > 1)
                 {
-                    WriteObject(instances,true);
+                    WriteObject(instances, true);
                 }
                 else if (instances.Count == 1)
                 {
